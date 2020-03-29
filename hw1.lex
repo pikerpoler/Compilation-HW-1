@@ -44,6 +44,6 @@ void showInt(int base){
         name = "HEX_INT";
         break;
   }
-  int n = strtol(yytext + 2, 0, base);
+  unsignd int n = strtol(yytext + 2, 0, base);
   printf("%d %s %u\n", yylineno, name, n);
 }
