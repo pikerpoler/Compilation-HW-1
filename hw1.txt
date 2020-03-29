@@ -5,7 +5,7 @@
 %option yylineno
 %option noyywrap
 
-whitespace ([ \t\n])
+whitespace	([ \t\n])
 
 ABC
 %%
