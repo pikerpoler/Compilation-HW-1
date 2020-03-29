@@ -8,8 +8,14 @@
 whitespace	([ \t\n])
 digit	([0-9])
 
+<<<<<<< HEAD
 ABC
 %%
 1313
+=======
 
+%%
+>>>>>>> 6b7c277dbac6cef8ef0413739d9cd8e4d183de1a
+
+LINE 14
 %%
