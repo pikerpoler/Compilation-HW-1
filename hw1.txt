@@ -13,7 +13,7 @@ letter	([a-zA-Z])
 printable ([!-~])|{whitespace}
 
 %%
-
+({_}|{letter})({letter}|{digit})* showToken("ID");
 
 %%
 
