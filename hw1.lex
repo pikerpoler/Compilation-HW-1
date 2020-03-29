@@ -12,11 +12,11 @@ digit	([0-9])
 hex ({digit}|[a-f]){1,6}
 letter	([a-zA-Z])
 printable ([!-~])|{whitespace}
-escape  (\)([nrt\"\\]|u\{{hex}\})
+escape  (\\)([nrt\"\\]|u\{{hex}\})
 
 %%
 (_|{letter})({letter}|{digit})* showToken("ID");
-(")({printable}|{escape})*(") showToken("STRING");
+\"({printable}|{escape})*\" showToken("STRING");
 {whitespace} ;
 . printf("I Dont Know What That Is!\n");
 %%
