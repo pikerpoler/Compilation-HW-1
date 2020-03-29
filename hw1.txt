@@ -12,10 +12,11 @@ digit	([0-9])
 hex ({digit}|[a-f]){1,6}
 letter	([a-zA-Z])
 printable ([!-~])|{whitespace}
-escape  (\)([])
+escape  (\)([nrt\"\\]|u\{{hex}\})
 
 %%
 (_|{letter})({letter}|{digit})* showToken("ID");
+(")({printable}|{escape})*(") showToken("STRING");
 
 %%
 
