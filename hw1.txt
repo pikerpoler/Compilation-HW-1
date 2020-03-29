@@ -7,8 +7,8 @@
 
 whitespace	([ \t\n])
 digit	([0-9])
-another test
-this is a test
+letter	([a-zA-Z])
+
 %%
 
 
