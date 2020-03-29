@@ -14,6 +14,8 @@ printable ([!-~])|{whitespace}
 
 %%
 (_|{letter})({letter}|{digit})* showToken("ID");
+{whitespace} ;
+. printf("I Dont Know What That Is!\n");
 
 %%
 
