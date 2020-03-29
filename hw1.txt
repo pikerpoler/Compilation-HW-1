@@ -9,8 +9,10 @@ void showToken(char *);
 
 whitespace	([ \t\n\r])
 digit	([0-9])
+hex ({digit}|[a-f]){1,6}
 letter	([a-zA-Z])
 printable ([!-~])|{whitespace}
+escape  (\)([])
 
 %%
 (_|{letter})({letter}|{digit})* showToken("ID");
