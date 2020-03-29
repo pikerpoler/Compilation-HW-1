@@ -1,5 +1,7 @@
 %{
 /* Declerations section */
+#include <stdio.h>
+void showToken(char *);
 %}
 
 %option yylineno
@@ -14,3 +16,9 @@ printable ([!-~])|{whitespace}
 
 
 %%
+
+void showToken(char * name){
+  printf("Token is %s\n", name);
+  printf("The lexeme is %s\n", yytext);
+
+}
