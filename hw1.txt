@@ -5,9 +5,10 @@
 %option yylineno
 %option noyywrap
 
-whitespace	([ \t\n\r])
+whitespace	([ \t\n])
 digit	([0-9])
 letter	([a-zA-Z])
+printable ([!-~])|{whitespace}
 
 %%
 
