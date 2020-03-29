@@ -6,6 +6,7 @@
 %option noyywrap
 
 whitespace	([ \t\n])
+digit	([0-9])
 
 ABC
 %%
