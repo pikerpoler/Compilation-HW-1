@@ -1,7 +1,9 @@
 %{
 /* Declerations section */
 #include <stdio.h>
+#include <stdlib.h>
 void showToken(char *);
+void showInt(int);
 %}
 
 %option yylineno
@@ -9,11 +11,11 @@ void showToken(char *);
 
 whitespace	([ \t\n\r])
 digit	([0-9])
-hex ({digit}|[a-f]){1,6}
+hex ({digit}|[a-f])
 letter	([a-zA-Z])
 oneliner ([!-~])|([ \t\r])
 printable {oneliner}|( )
-escape  (\\)([nrt\\"\\]|u\{{hex}\})
+escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %%
 (_|{letter})({letter}|{digit})* showToken("ID");
@@ -24,4 +26,24 @@ escape  (\\)([nrt\\"\\]|u\{{hex}\})
 
 void showToken(char * name){
   printf("%d %s %s\n", yylineno, name, yytext);
+}
+
+void showInt(int base){
+  const char* name;
+  switch(base){
+  case 2:
+        name = "BIN_INT";
+        break;
+  case 8:
+        name = "OCT_INT";
+        break;
+  case 10:
+        name = "DEC_INT";
+        break;
+  case 16:
+        name = "HEX_INT";
+        break;
+  }
+  int n = strtol(yytext + 2, 0, base);
+  printf("%d %s %u\n", yylineno, name, n);
 }
