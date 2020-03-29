@@ -2,6 +2,10 @@
 /* Declerations section */
 %}
 
+%option yylineno
+%option noyywrap
+
+whitespace ([ \t\n])
 
 %%
 
