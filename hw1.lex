@@ -20,6 +20,7 @@ digit	([0-9])
 hex ({digit}|[a-f])
 int ({digit})+$
 letter	([a-zA-Z])
+character[\t !#-\[\]-~]
 oneliner ([!-~])|([ \t\r])
 printable {oneliner}|( )
 escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
