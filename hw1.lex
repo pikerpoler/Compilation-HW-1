@@ -21,8 +21,19 @@ printable {oneliner}|( )
 escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %%
-(_|{letter})({letter}|{digit})*$ showToken("ID");
-\"({oneliner}|{escape})*\"$ showString("STRING");
+;  showToken("SC");
+, showToken("COMMA");
+\x28 showToken("LPAREN");
+\x29 showToken("RPAREN");
+\x7B showToken("LBRACE");
+\x7D showToken("RBRACE");
+\x5B showToken("RBRACKET");
+\x5D showToken("LBRACKET");
+= showToken("ASSIGN");
+\x3A showToken("COLON");
+
+(_|{letter})({letter}|{digit})* showToken("ID");
+\"({oneliner}|{escape})*\" showString("STRING");
 {whitespace} ;
 0b([01])+$ showInt(2);
 0o([0-7])+$ showInt(8);
