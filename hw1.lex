@@ -4,7 +4,7 @@
 #include <stdlib.h>
 void showToken(char *);
 void showInt(int);
-void showString(char *);
+void showString(char *,char *);
 void errorMessage(char *);
 
 char string_buf[1024];
@@ -63,15 +63,15 @@ false showToken("FALSE");
 
 
 \" string_buf_ptr = string_buf; BEGIN(str);
-<str>\" *string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);
+<str>\" *string_buf_ptr = '\0'; showString("STRING",string_buf); BEGIN(INITIAL);
 <str>\\n *string_buf_ptr++ = '\n';
 <str>\\t *string_buf_ptr++ = '\t';
 <str>\\r *string_buf_ptr++ = '\r';
-<str>\\\\ *string_buf_ptr++ = '\';
-<str>\\\" *string_buf_ptr++ = '"';
+<str>\x5C\x5C *string_buf_ptr++ = 0x5C;
+<str>\x5C\x22 *string_buf_ptr++ = '"';
 
 <str>\\u\x7B(({digit}|[a-f]){1,6})\x7D {
-char[6] temp = {'\0'};
+char temp[6] = {'\0'};
 int i = 0;
 while(yytext[3 + i] != '}' && i < 6){
   temp[i] = yytext[3 + i];
@@ -124,12 +124,7 @@ void showInt(int base){
   printf("%d %s %d\n", yylineno, name, n);
 }
 
-void showString(char *name){
-	char* text=yytext;
-	int len=strlen(text);
-	text++;
-	text[len-2]='\0';
-	printf(text);
+void showString(char *name,char *text){
 	printf("%d %s %s\n", yylineno, name, text);
 }
 void errorMessage(char* message){
