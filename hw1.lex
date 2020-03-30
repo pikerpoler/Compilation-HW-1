@@ -28,8 +28,7 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 %x str
 
 %%
-
-
+<<<<<<< HEAD
 
 \"  {string_buf_ptr = string_buf; BEGIN(str);}
 <str>\"   {*string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);}
@@ -38,6 +37,7 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 <str>\\r  {*string_buf_ptr++ = ’\r’;}
 <str>\\\\ {*string_buf_ptr++ = ’\’;}
 <str>\\\" {*string_buf_ptr++ = ’"’;}
+
 <str>\\u\{{hex}{1,6}\} {
 char[6] temp = {'\0'};
 int i = 0;
@@ -56,22 +56,56 @@ errorMessage("undefined escape sequence u");
 <str>({character})  {*string_buf_ptr++ = *yytext;}
 
 
-
+=======
+;  showToken("SC");
+, showToken("COMMA");
+\x28 showToken("LPAREN");
+\x29 showToken("RPAREN");
+\x7B showToken("LBRACE");
+\x7D showToken("RBRACE");
+\x5B showToken("RBRACKET");
+\x5D showToken("LBRACKET");
+= showToken("ASSIGN");
+\x3A showToken("COLON");
+var showToken("VAR");
+let showToken("LET");
+func showToken("FUNC");
+import showToken("IMPORT");
+nil showToken("NIL");
+while showToken("WHILE");
+if showToken("IF");
+else showToken("ELSE");
+return showToken("RETURN");
+(Int|UInt|Double|Float|Bool|String|Character) showToken("TYPE");
+true showToken("TRUE");
+false showToken("FALSE");
+==|!=|<|>|<=|>= showToken("RELOP");
+\x2B|\x2D|\x2A|\x2F|\x25 showToken("BINOP");
+\x26\x26|\x7C\x7C showToken("LOGOP");
+\x2D\x3E showToken("ARROW");
 
 
 (_|{letter})({letter}|{digit})* showToken("ID");
+\"({oneliner}|{escape})*\" showString("STRING");
+>>>>>>> d30ad0ece1f65a418a556d29825a2464bffbbcea
 {whitespace} ;
 0b([01])+ showInt(2);
 0o([0-7])+ showInt(8);
 0x({hex})+ showInt(16);
 {int} showInt(10);
 ({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
-0x({hex})+p[\+-]int
+0x({hex})+p[\+-]int showToken("HEX_FP");
+<<<<<<< HEAD
+=======
 
-
+>>>>>>> d30ad0ece1f65a418a556d29825a2464bffbbcea
 
 . printf("I Dont Know What That Is!\n");
+
+
+
 %%
+
 
 void showToken(char * name){
   printf("%d %s %s\n", yylineno, name, yytext);
