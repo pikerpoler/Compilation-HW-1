@@ -29,6 +29,8 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %%
 
+
+
 \"  {string_buf_ptr = string_buf; BEGIN(str);}
 <str>\"   {*string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);}
 <str>\\n  {*string_buf_ptr++ = ’\n’;}
@@ -36,7 +38,6 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 <str>\\r  {*string_buf_ptr++ = ’\r’;}
 <str>\\\\ {*string_buf_ptr++ = ’\’;}
 <str>\\\" {*string_buf_ptr++ = ’"’;}
-
 <str>\\u\{{hex}{1,6}\} {
 char[6] temp = {'\0'};
 int i = 0;
@@ -55,20 +56,22 @@ errorMessage("undefined escape sequence u");
 <str>({character})  {*string_buf_ptr++ = *yytext;}
 
 
+
+
+
+(_|{letter})({letter}|{digit})* showToken("ID");
 {whitespace} ;
 0b([01])+ showInt(2);
 0o([0-7])+ showInt(8);
 0x({hex})+ showInt(16);
 {int} showInt(10);
 ({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
-0x({hex})+p[\+-]int showToken("HEX_FP");
+0x({hex})+p[\+-]int
+
+
 
 . printf("I Dont Know What That Is!\n");
-
-
-
 %%
-
 
 void showToken(char * name){
   printf("%d %s %s\n", yylineno, name, yytext);
