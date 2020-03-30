@@ -60,15 +60,17 @@ false showToken("FALSE");
 (_|{letter})({letter}|{digit})* showToken("ID");
 
 
-\"  {string_buf_ptr = string_buf; BEGIN(str);}
-<str>\"   {*string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);}
-<str>\\n  {*string_buf_ptr++ = ’\n’;}
-<str>\\t  {*string_buf_ptr++ = ’\t’;}
-<str>\\r  {*string_buf_ptr++ = ’\r’;}
-<str>\\\\ {*string_buf_ptr++ = ’\’;}
-<str>\\\" {*string_buf_ptr++ = ’"’;}
 
-<str>\\u\{{hex}{1,6}\} {
+
+\" string_buf_ptr = string_buf; BEGIN(str);
+<str>\" *string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);
+<str>\\n *string_buf_ptr++ = '\n';
+<str>\\t *string_buf_ptr++ = '\t';
+<str>\\r *string_buf_ptr++ = '\r';
+<str>\\\\ *string_buf_ptr++ = '\';
+<str>\\\" *string_buf_ptr++ = '"';
+
+<str>\\u\x7B(({digit}|[a-f]){1,6})\x7D {
 char[6] temp = {'\0'};
 int i = 0;
 while(yytext[3 + i] != '}' && i < 6){
