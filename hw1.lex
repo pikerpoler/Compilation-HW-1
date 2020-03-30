@@ -31,7 +31,6 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 \x5D showToken("LBRACKET");
 = showToken("ASSIGN");
 \x3A showToken("COLON");
-
 var showToken("VAR");
 let showToken("LET");
 func showToken("FUNC");
@@ -44,7 +43,6 @@ return showToken("RETURN");
 (Int|UInt|Double|Float|Bool|String|Character) showToken("TYPE");
 true showToken("TRUE");
 false showToken("FALSE");
-
 ==|!=|<|>|<=|>= showToken("RELOP");
 \x2B|\x2D|\x2A|\x2F|\x25 showToken("BINOP");
 \x26\x26|\x7C\x7C showToken("LOGOP");
@@ -54,12 +52,12 @@ false showToken("FALSE");
 (_|{letter})({letter}|{digit})* showToken("ID");
 \"({oneliner}|{escape})*\" showString("STRING");
 {whitespace} ;
-0b([01])+$ showInt(2);
-0o([0-7])+$ showInt(8);
-0x({hex})+$ showInt(16);
+0b([01])+ showInt(2);
+0o([0-7])+ showInt(8);
+0x({hex})+ showInt(16);
 {int} showInt(10);
-({digit})*\.({digit})*([eE][\+-]int)?$ showToken("DEC_REAL");
-0x({hex})+p[\+-]int$
+({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
+0x({hex})+p[\+-]int showToken("HEX_FP");
 
 
 . printf("I Dont Know What That Is!\n");
