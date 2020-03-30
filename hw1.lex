@@ -5,10 +5,6 @@
 void showToken(char *);
 void showInt(int);
 void showString(char *);
-void errorMessage(char *);
-
-char string_buf[1024];
-char* string_buf_ptr;
 
 %}
 
@@ -18,16 +14,14 @@ char* string_buf_ptr;
 whitespace	([ \t\n\r])
 digit	([0-9])
 hex ({digit}|[a-f])
-int ({digit})+
+int ({digit})+$
 letter	([a-zA-Z])
 oneliner ([!-~])|([ \t\r])
-character [\t\r !#-\[\]-~]
 printable {oneliner}|( )
 escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
-%x str
-
 %%
+<<<<<<< HEAD
 
 \"  {string_buf_ptr = string_buf; BEGIN(str);}
 <str>\"   {*string_buf_ptr = '\0'; printf("the string is %s",string_buf); BEGIN(INITIAL);}
@@ -55,6 +49,38 @@ errorMessage("undefined escape sequence u");
 <str>({character})  {*string_buf_ptr++ = *yytext;}
 
 
+=======
+;  showToken("SC");
+, showToken("COMMA");
+\x28 showToken("LPAREN");
+\x29 showToken("RPAREN");
+\x7B showToken("LBRACE");
+\x7D showToken("RBRACE");
+\x5B showToken("RBRACKET");
+\x5D showToken("LBRACKET");
+= showToken("ASSIGN");
+\x3A showToken("COLON");
+var showToken("VAR");
+let showToken("LET");
+func showToken("FUNC");
+import showToken("IMPORT");
+nil showToken("NIL");
+while showToken("WHILE");
+if showToken("IF");
+else showToken("ELSE");
+return showToken("RETURN");
+(Int|UInt|Double|Float|Bool|String|Character) showToken("TYPE");
+true showToken("TRUE");
+false showToken("FALSE");
+==|!=|<|>|<=|>= showToken("RELOP");
+\x2B|\x2D|\x2A|\x2F|\x25 showToken("BINOP");
+\x26\x26|\x7C\x7C showToken("LOGOP");
+\x2D\x3E showToken("ARROW");
+
+
+(_|{letter})({letter}|{digit})* showToken("ID");
+\"({oneliner}|{escape})*\" showString("STRING");
+>>>>>>> ab771bb79383552a626c18428a907ac9ab27603b
 {whitespace} ;
 0b([01])+ showInt(2);
 0o([0-7])+ showInt(8);
@@ -62,9 +88,12 @@ errorMessage("undefined escape sequence u");
 {int} showInt(10);
 ({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
 0x({hex})+p[\+-]int showToken("HEX_FP");
+<<<<<<< HEAD
 
 . printf("I Dont Know What That Is!\n");
 
+=======
+>>>>>>> ab771bb79383552a626c18428a907ac9ab27603b
 
 
 %%
@@ -101,9 +130,4 @@ void showString(char *name){
 	text[len-2]='\0';
 	printf(text);
 	printf("%d %s %s\n", yylineno, name, text);
-}
-
-void errorMessage(char* message){
-printf("%s\n",message);
-exit(0);
 }
