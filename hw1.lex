@@ -32,6 +32,20 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 = showToken("ASSIGN");
 \x3A showToken("COLON");
 
+var showToken("VAR");
+let showToken("LET");
+func showToken("FUNC");
+import showToken("IMPORT");
+nil showToken("NIL");
+while showToken("WHILE");
+if showToken("IF");
+else showToken("ELSE");
+return showToken("RETURN");
+(Int|UInt|Double|Float|Bool|String|Character) showToken("TYPE");
+true showToken("TRUE");
+false showToken("FALSE");
+
+
 (_|{letter})({letter}|{digit})* showToken("ID");
 \"({oneliner}|{escape})*\" showString("STRING");
 {whitespace} ;
