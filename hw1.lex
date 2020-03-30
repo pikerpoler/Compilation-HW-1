@@ -41,7 +41,7 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 <str>\\u\{{hex}{1,6}\} {
 char[6] temp = {'\0'};
 int i = 0;
-while(yytext[3 + i] != 125 && i < 6){
+while(yytext[3 + i] != '}' && i < 6){
   temp[i] = yytext[3 + i];
   i++;
 }
