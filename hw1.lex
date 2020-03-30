@@ -21,15 +21,15 @@ printable {oneliner}|( )
 escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %%
-(_|{letter})({letter}|{digit})* showToken("ID");
-\"({oneliner}|{escape})*\"(whitespace)? showString("STRING");
+(_|{letter})({letter}|{digit})*$ showToken("ID");
+\"({oneliner}|{escape})*\"$ showString("STRING");
 {whitespace} ;
 0b([01])+$ showInt(2);
 0o([0-7])+$ showInt(8);
 0x({hex})+$ showInt(16);
 {int} showInt(10);
-({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
-0x({hex})+p[\+-]int
+({digit})*\.({digit})*([eE][\+-]int)?$ showToken("DEC_REAL");
+0x({hex})+p[\+-]int$
 
 
 . printf("I Dont Know What That Is!\n");
