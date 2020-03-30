@@ -45,6 +45,11 @@ return showToken("RETURN");
 true showToken("TRUE");
 false showToken("FALSE");
 
+==|!=|<|>|<=|>= showToken("RELOP");
+\x2B|\x2D|\x2A|\x2F|\x25 showToken("BINOP");
+\x26\x26|\x7C\x7C showToken("LOGOP");
+\x2D\x3E showToken("ARROW");
+
 
 (_|{letter})({letter}|{digit})* showToken("ID");
 \"({oneliner}|{escape})*\" showString("STRING");
