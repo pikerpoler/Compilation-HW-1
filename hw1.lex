@@ -5,7 +5,8 @@
 void showToken(char *);
 void showInt(int);
 void showString(char *,char *);
-void errorMessage(char *);
+void errorMessage(char *, char);
+void error(char *);
 
 char string_buf[1024];
 char* string_buf_ptr;
@@ -22,10 +23,12 @@ int ({digit})+$
 letter	([a-zA-Z])
 character[\t !#-\[\]-~]
 oneliner ([!-~])|([ \t\r])
-printable {oneliner}|( )
+printable {oneliner}|(\n)
 escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %x str
+%x comment
+
 
 %%
 ;  showToken("SC");
@@ -55,6 +58,12 @@ false showToken("FALSE");
 \x26\x26|\x7C\x7C showToken("LOGOP");
 \x2D\x3E showToken("ARROW");
 
+0b([01])+ showInt(2);
+0o([0-7])+ showInt(8);
+0x({hex})+ showInt(16);
+{int} showInt(10);
+({digit})*\.({digit})*([eE][\2B\2D]int)? showToken("DEC_REAL");
+0x({hex})+p[\+-]int showToken("HEX_FP");
 
 
 (_|{letter})({letter}|{digit})* showToken("ID");
@@ -69,7 +78,6 @@ false showToken("FALSE");
 <str>\\r *string_buf_ptr++ = '\r';
 <str>\x5C\x5C *string_buf_ptr++ = 0x5C;
 <str>\x5C\x22 *string_buf_ptr++ = '"';
-
 <str>\\u\x7B(({digit}|[a-f]){1,6})\x7D {
 char temp[6] = {'\0'};
 int i = 0;
@@ -81,23 +89,23 @@ i = atoi(temp);
 if((0x20 <= i && i <= 0x7E) || i=='\n'|| i=='\t'|| i=='\r'){
 *string_buf_ptr++ = i;
 }else{
-errorMessage("undefined escape sequence u");
+error("undefined escape sequence u");
 }
 }
-
 <str>({character})  {*string_buf_ptr++ = *yytext;}
+<str>\.+  {errorMessage("undefined escape sequence",yytext[1]);}
+
+\2F\2A  BEGIN(comment);
+<comment>\2A\2F  showToken("COMMENT"); BEGIN(INITIAL);
+<comment>\2F\2A {error("Warning nested comment");}
+
+\2F\2F[^\0A]*\0A  showToken("COMMENT");
+
+
 
 
 {whitespace} ;
-0b([01])+ showInt(2);
-0o([0-7])+ showInt(8);
-0x({hex})+ showInt(16);
-{int} showInt(10);
-({digit})*\.({digit})*([eE][\+-]int)? showToken("DEC_REAL");
-0x({hex})+p[\+-]int showToken("HEX_FP");
-
-
-. printf("I Dont Know What That Is!\n");
+. errorMessage("Error", yytext[0]);
 %%
 
 void showToken(char * name){
@@ -127,7 +135,11 @@ void showInt(int base){
 void showString(char *name,char *text){
 	printf("%d %s %s\n", yylineno, name, text);
 }
-void errorMessage(char* message){
+void errorMessage(char* message, char c){
+printf("%s %c\n",c);
+exit(0);
+}
+void error(char* message){
 printf("%s\n",message);
 exit(0);
 }
