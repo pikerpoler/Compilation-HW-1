@@ -19,7 +19,7 @@ char* string_buf_ptr;
 whitespace	([ \t\n\r])
 digit	([0-9])
 hex ({digit}|[a-f])
-int ({digit})+$
+int ({digit})+
 letter	([a-zA-Z])
 character[\t !#-\[\]-~]
 oneliner ([!-~])|([ \t\r])
@@ -62,8 +62,8 @@ false showToken("FALSE");
 0o([0-7])+ showInt(8);
 0x({hex})+ showInt(16);
 {int} showInt(10);
-({digit})*\.({digit})*([eE][\2B\2D]int)? showToken("DEC_REAL");
-0x({hex})+p[\+-]int showToken("HEX_FP");
+{digit}*\.{digit}+(([eE])([\+-]){int}){0,1} showToken("DEC_REAL");
+0x{hex}+p([\+-]){int} showToken("HEX_FP");
 
 
 (_|{letter})({letter}|{digit})* showToken("ID");
@@ -93,7 +93,7 @@ error("undefined escape sequence u");
 }
 }
 <str>({character})  {*string_buf_ptr++ = *yytext;}
-<str>\.+  {errorMessage("undefined escape sequence",yytext[1]);}
+<str>\\.  {;errorMessage("undefined escape sequence",yytext[0]);}
 
 \2F\2A  BEGIN(comment);
 <comment>\2A\2F  showToken("COMMENT"); BEGIN(INITIAL);
@@ -114,6 +114,7 @@ void showToken(char * name){
 
 void showInt(int base){
   const char* name;
+  int offset = 2;
   switch(base){
   case 2:
         name = "BIN_INT";
@@ -123,12 +124,13 @@ void showInt(int base){
         break;
   case 10:
         name = "DEC_INT";
+        offset = 0;
         break;
   case 16:
         name = "HEX_INT";
         break;
   }
-  int n = strtol(yytext + 2, 0, base);
+  int n = strtol(yytext + offset, 0, base);
   printf("%d %s %d\n", yylineno, name, n);
 }
 
