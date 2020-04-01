@@ -6,7 +6,7 @@ void showToken(char *);
 void showInt(int);
 void showString(char *,char *);
 void showComment();
-void errorMessage(char *, char);
+
 void error(char *);
 
 char string_buf[1024];
@@ -39,8 +39,8 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 \x29 showToken("RPAREN");
 \x7B showToken("LBRACE");
 \x7D showToken("RBRACE");
-\x5B showToken("RBRACKET");
-\x5D showToken("LBRACKET");
+\] showToken("RBRACKET");
+\[ showToken("LBRACKET");
 = showToken("ASSIGN");
 \x3A showToken("COLON");
 var showToken("VAR");
@@ -65,19 +65,15 @@ false showToken("FALSE");
 0x({hex})+ showInt(16);
 {int} showInt(10);
 (({digit}*\.{digit}+)|({digit}+\.{digit}*))(([eE])([\+-]){int}){0,1} showToken("DEC_REAL");
-0x{hex}+p([\+-]){int} showToken("HEX_FP");
+0x{hex}+(p|P)([\+-]){int} showToken("HEX_FP");
 
-
-(_|{letter})({letter}|{digit})* showToken("ID");
-
-
-
+_({letter}|{digit})+|{letter}({letter}|{digit})* showToken("ID");
 
 \" string_buf_ptr = string_buf; BEGIN(str);
 <str>\" *string_buf_ptr = '\0'; showString("STRING",string_buf); BEGIN(INITIAL);
-<str>\\n *string_buf_ptr++ = '\n';
-<str>\\t *string_buf_ptr++ = '\t';
-<str>\\r *string_buf_ptr++ = '\r';
+<str>\\n *string_buf_ptr++ = 0x0A;
+<str>\\t *string_buf_ptr++ = 0x09;
+<str>\\r *string_buf_ptr++ = 0x0D;
 <str>\x5C\x5C *string_buf_ptr++ = 0x5C;
 <str>\x5C\x22 *string_buf_ptr++ = '"';
 <str>\\u\x7B(({hex}){1,6})\x7D {
@@ -95,7 +91,7 @@ error("undefined escape sequence u");
 }
 }
 <str>({character})  {*string_buf_ptr++ = *yytext;}
-<str>\\.  {printf("undefined escape sequence %c\n",yytext[1]);exit(1);}
+<str>\\.  printf("undefined escape sequence %c\n",yytext[1]);exit(1);
 <str>[\x0A\x0D] error("Error unclosed string");
 
 \x2F\x2A  BEGIN(comment);comment_lines = 1;
@@ -105,18 +101,13 @@ error("undefined escape sequence u");
 <comment><<EOF>> error("Error unclosed comment");
 <comment>. ;
 
-
 \x2F\x2F  BEGIN(lineComment);comment_lines = 1;
 <lineComment>[\x0A\x0D] showComment();BEGIN(INITIAL);
 <lineComment><<EOF>> showComment();BEGIN(INITIAL);
 <lineComment>. ;
 
-
-
-
-
 {whitespace} ;
-. errorMessage("Error", yytext[0]);
+. printf("Error %c\n",yytext[1]);exit(1);
 %%
 
 void showToken(char * name){
@@ -148,10 +139,7 @@ void showInt(int base){
 void showString(char *name,char *text){
 	printf("%d %s %s\n", yylineno, name, text);
 }
-void errorMessage(char* message, char c){
-printf("%s %c\n",c);
-exit(0);
-}
+
 void error(char* message){
 printf("%s\n",message);
 exit(0);
