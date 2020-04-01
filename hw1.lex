@@ -5,11 +5,13 @@
 void showToken(char *);
 void showInt(int);
 void showString(char *,char *);
+void showComment();
 void errorMessage(char *, char);
 void error(char *);
 
 char string_buf[1024];
 char* string_buf_ptr;
+int comment_lines;
 
 %}
 
@@ -18,7 +20,7 @@ char* string_buf_ptr;
 
 whitespace	([ \t\n\r])
 digit	([0-9])
-hex ({digit}|[a-f])
+hex ({digit}|[a-fA-F])
 int ({digit})+
 letter	([a-zA-Z])
 character[\t !#-\[\]-~]
@@ -28,7 +30,7 @@ escape  (\\)([nrt\\"\\]|u\{({hex}){1,6}\})
 
 %x str
 %x comment
-
+%x lineComment
 
 %%
 ;  showToken("SC");
@@ -62,7 +64,7 @@ false showToken("FALSE");
 0o([0-7])+ showInt(8);
 0x({hex})+ showInt(16);
 {int} showInt(10);
-{digit}*\.{digit}+(([eE])([\+-]){int}){0,1} showToken("DEC_REAL");
+(({digit}*\.{digit}+)|({digit}+\.{digit}*))(([eE])([\+-]){int}){0,1} showToken("DEC_REAL");
 0x{hex}+p([\+-]){int} showToken("HEX_FP");
 
 
@@ -78,14 +80,14 @@ false showToken("FALSE");
 <str>\\r *string_buf_ptr++ = '\r';
 <str>\x5C\x5C *string_buf_ptr++ = 0x5C;
 <str>\x5C\x22 *string_buf_ptr++ = '"';
-<str>\\u\x7B(({digit}|[a-f]){1,6})\x7D {
+<str>\\u\x7B(({hex}){1,6})\x7D {
 char temp[6] = {'\0'};
 int i = 0;
 while(yytext[3 + i] != '}' && i < 6){
   temp[i] = yytext[3 + i];
   i++;
 }
-i = atoi(temp);
+i = strtol(temp,0,16);
 if((0x20 <= i && i <= 0x7E) || i=='\n'|| i=='\t'|| i=='\r'){
 *string_buf_ptr++ = i;
 }else{
@@ -93,13 +95,22 @@ error("undefined escape sequence u");
 }
 }
 <str>({character})  {*string_buf_ptr++ = *yytext;}
-<str>\\.  {;errorMessage("undefined escape sequence",yytext[0]);}
+<str>\\.  {printf("undefined escape sequence %c\n",yytext[1]);exit(1);}
+<str>[\x0A\x0D] error("Error unclosed string");
 
-\2F\2A  BEGIN(comment);
-<comment>\2A\2F  showToken("COMMENT"); BEGIN(INITIAL);
-<comment>\2F\2A {error("Warning nested comment");}
+\x2F\x2A  BEGIN(comment);comment_lines = 1;
+<comment>\x2A\x2F  showComment(); BEGIN(INITIAL);comment_lines = 1;
+<comment>\x0D\x0A|\x0A|\x0D  comment_lines++;
+<comment>\x2F\x2A {error("Warning nested comment");}
+<comment><<EOF>> error("Error unclosed comment");
+<comment>. ;
 
-\2F\2F[^\0A]*\0A  showToken("COMMENT");
+
+\x2F\x2F  BEGIN(lineComment);comment_lines = 1;
+<lineComment>[\x0A\x0D] showComment();BEGIN(INITIAL);
+<lineComment><<EOF>> showComment();BEGIN(INITIAL);
+<lineComment>. ;
+
 
 
 
@@ -144,4 +155,8 @@ exit(0);
 void error(char* message){
 printf("%s\n",message);
 exit(0);
+}
+
+void showComment(){
+printf("%d COMMENT %d\n",yylineno,comment_lines);
 }
