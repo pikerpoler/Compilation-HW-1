@@ -87,11 +87,11 @@ i = strtol(temp,0,16);
 if((0x20 <= i && i <= 0x7E) || i=='\n'|| i=='\t'|| i=='\r'){
 *string_buf_ptr++ = i;
 }else{
-error("undefined escape sequence u");
+error("Error undefined escape sequence u");
 }
 }
 <str>({character})  {*string_buf_ptr++ = *yytext;}
-<str>\\.  printf("undefined escape sequence %c\n",yytext[1]);exit(1);
+<str>\\.  printf("Error undefined escape sequence %c\n",yytext[1]);exit(1);
 <str>[\x0A\x0D] error("Error unclosed string");
 
 \x2F\x2A  BEGIN(comment);comment_lines = 1;
@@ -107,7 +107,7 @@ error("undefined escape sequence u");
 <lineComment>. ;
 
 {whitespace} ;
-. printf("Error %c\n",yytext[1]);exit(1);
+. printf("Error %s\n",yytext);exit(0);
 %%
 
 void showToken(char * name){
