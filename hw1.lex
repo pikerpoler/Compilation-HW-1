@@ -6,6 +6,7 @@ void showToken(char *);
 void showInt(int);
 void showString(char *,char *);
 void showComment();
+void showLineComment();
 
 void error(char *);
 
@@ -91,20 +92,28 @@ error("Error undefined escape sequence u");
 }
 }
 <str>({character})  {*string_buf_ptr++ = *yytext;}
-<str>\\.  printf("Error undefined escape sequence %c\n",yytext[1]);exit(1);
+<str>\x5C[\x0A\x0D]  printf("Error undefined escape sequence \n\n");exit(0);
+<str>\x5C.  printf("Error undefined escape sequence %c\n",yytext[1]);exit(0);
+<str>[^\x20-\x7E\x09\x0A\x0D] printf("Error %c\n",yytext[0]);exit(0);
 <str>[\x0A\x0D] error("Error unclosed string");
+<str><<EOF>> error("Error unclosed string");
+<str>. ;
+
+\x2F\x2F  BEGIN(lineComment);comment_lines = 1;
+<lineComment>[\x0A\x0D] showLineComment();BEGIN(INITIAL);
+<lineComment>[^\x20-\x7E\x09\x0A\x0D] showComment();printf("Error %s\n",yytext);exit(0);
+<lineComment><<EOF>> showComment();BEGIN(INITIAL);
+<lineComment>. ;
 
 \x2F\x2A  BEGIN(comment);comment_lines = 1;
 <comment>\x2A\x2F  showComment(); BEGIN(INITIAL);comment_lines = 1;
 <comment>\x0D\x0A|\x0A|\x0D  comment_lines++;
+<comment>[^\x20-\x7E\x09\x0A\x0D] printf("Error %s\n",yytext);exit(0);
 <comment>\x2F\x2A {error("Warning nested comment");}
 <comment><<EOF>> error("Error unclosed comment");
 <comment>. ;
 
-\x2F\x2F  BEGIN(lineComment);comment_lines = 1;
-<lineComment>[\x0A\x0D] showComment();BEGIN(INITIAL);
-<lineComment><<EOF>> showComment();BEGIN(INITIAL);
-<lineComment>. ;
+
 
 {whitespace} ;
 . printf("Error %s\n",yytext);exit(0);
@@ -147,4 +156,8 @@ exit(0);
 
 void showComment(){
 printf("%d COMMENT %d\n",yylineno,comment_lines);
+}
+
+void showLineComment(){
+printf("%d COMMENT %d\n",yylineno-1,comment_lines);
 }
